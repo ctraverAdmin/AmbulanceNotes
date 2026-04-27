@@ -425,26 +425,7 @@ textarea {
   }
 
   .print-summary {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    border: 1px solid #d1d5db;
-    padding: 6px;
-    margin-bottom: 10px;
-  }
-
-  .print-summary p {
-    margin: 0;
-    font-size: 10px;
-    white-space: nowrap;
-    line-height: 1.2;
-  }
-
-  .print-summary p:last-child {
-    background: #fff3b0;
-    border: 1px solid #d6a800;
-    padding: 4px 6px;
-    font-weight: 900;
+    display: none !important;
   }
 
   .print-report h3 {
@@ -453,6 +434,10 @@ textarea {
     line-height: 1.1;
     text-transform: uppercase;
     font-weight: 900;
+  }
+
+  .print-report h3:has(+ .transaction-detail-print-table) {
+    display: none !important;
   }
 
   .print-table {
@@ -488,40 +473,38 @@ textarea {
   }
 
   .vendor-summary-table {
+    width: 100%;
     font-size: 9px;
     margin-bottom: 10px;
     table-layout: fixed;
+    border-collapse: collapse;
   }
 
   .vendor-summary-table th,
   .vendor-summary-table td {
-    padding: 3px 4px;
+    padding: 4px 6px;
     line-height: 1.15;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .vendor-summary-table th:nth-child(2),
+  .vendor-summary-table td:nth-child(2),
+  .vendor-summary-table th:nth-child(4),
+  .vendor-summary-table td:nth-child(4) {
+    display: none !important;
   }
 
   .vendor-summary-table th:nth-child(1),
   .vendor-summary-table td:nth-child(1) {
-    width: 26%;
-  }
-
-  .vendor-summary-table th:nth-child(2),
-  .vendor-summary-table td:nth-child(2) {
-    width: 12%;
-    text-align: center;
+    width: 70% !important;
   }
 
   .vendor-summary-table th:nth-child(3),
   .vendor-summary-table td:nth-child(3) {
-    width: 12%;
-    text-align: right;
-  }
-
-  .vendor-summary-table th:nth-child(4),
-  .vendor-summary-table td:nth-child(4) {
-    width: 50%;
+    width: 30% !important;
+    text-align: right !important;
   }
 
   .vendor-summary-table td:nth-child(3) {
@@ -529,50 +512,18 @@ textarea {
     font-weight: 900;
   }
 
-  .transaction-detail-print-table {
-    font-size: 9px;
+  .vendor-grand-total-row td {
+    border-top: 2px solid #111827 !important;
+    font-weight: 900 !important;
+    background: #fff3b0 !important;
+    font-size: 11px !important;
   }
 
-  .transaction-detail-print-table th:nth-child(1),
-  .transaction-detail-print-table td:nth-child(1) {
-    width: 22%;
+  .vendor-grand-total-row td:nth-child(1),
+  .vendor-grand-total-row td:nth-child(3) {
+    text-align: right !important;
   }
 
-  .transaction-detail-print-table th:nth-child(2),
-  .transaction-detail-print-table td:nth-child(2) {
-    width: 10%;
-  }
-
-  .transaction-detail-print-table th:nth-child(3),
-  .transaction-detail-print-table td:nth-child(3) {
-    width: 10%;
-    text-align: right;
-  }
-
-  .transaction-detail-print-table th:nth-child(4),
-  .transaction-detail-print-table td:nth-child(4) {
-    width: 58%;
-  }
-
-  .transaction-detail-print-table td:nth-child(3) {
-    background: #fff3b0;
-    font-weight: 900;
-  }
-
-  .transaction-detail-print-table td:nth-child(4) {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.15;
-  }
-
-  .vendor-summary-table td:nth-child(4) {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.15;
-  }
-  /* Hide all transaction details from the printed board report */
   .transaction-detail-print-table,
   .transaction-detail-print-table thead,
   .transaction-detail-print-table tbody,
@@ -582,53 +533,4 @@ textarea {
   .transaction-detail-print-table td {
     display: none !important;
   }
-
-  /* Hide the top summary row */
-  .print-summary {
-    display: none !important;
-  }
-
-  /* Hide the Transaction Detail heading */
-  .print-report h3:has(+ .transaction-detail-print-table) {
-    display: none !important;
-  }
-}
-
-  /* Hide transaction details from the printed board report */
-.transaction-detail-print-table,
-.transaction-detail-print-table th,
-.transaction-detail-print-table td,
-.transaction-detail-print-table tr {
-  display: none !important;
-}
-
-  .transaction-detail-print-table tr.kunkle-print-row td {
-    height: auto;
-    min-height: 34px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    vertical-align: top;
-  }
-
-  .transaction-detail-print-table tr.kunkle-print-row td:nth-child(4) {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
-  }
-
-  .vendor-grand-total-row td {
-  border-top: 2px solid #111827 !important;
-  font-weight: 900 !important;
-  background: #fff3b0 !important;
-  font-size: 11px !important;
-}
-
-.vendor-grand-total-row td:nth-child(1) {
-  text-align: right !important;
-}
-
-.vendor-grand-total-row td:nth-child(3) {
-  text-align: right !important;
-}
 }
