@@ -38,7 +38,7 @@ const defaultRules = [
     id: crypto.randomUUID(),
     matchType: "vendor",
     matchText: "KUNKLE FIRE",
-    note: "ALS BILLING",
+    note: "ALS Billing",
   },
   {
     id: crypto.randomUUID(),
@@ -314,10 +314,10 @@ function getPrintedBoardNote(row) {
 
   if (isKunkleFireRow(row)) {
     if (memo) {
-      return `ALS BILLING — ${memo}`;
+      return `ALS Billing — ${memo}`;
     }
 
-    return "ALS BILLING — memo not provided.";
+    return "ALS Billing — memo not provided.";
   }
 
   return row.boardNote;
@@ -325,7 +325,7 @@ function getPrintedBoardNote(row) {
 
 function getVendorSummaryNote(row) {
   if (isKunkleFireRow(row)) {
-    return "ALS BILLING";
+    return "ALS Billing";
   }
 
   return getPrintedBoardNote(row);
@@ -501,12 +501,21 @@ What summary note should be used for this vendor?`
             : row
         );
 
-        newRulesFromPrompts.push({
-          id: crypto.randomUUID(),
-          matchType: "vendor",
-          matchText: vendor,
-          note: cleanNote,
-        });
+        const saveForFuture = confirm(
+          `Do you want to save this note for future reports?
+
+Vendor: ${vendor}
+Note: ${cleanNote}`
+        );
+
+        if (saveForFuture) {
+          newRulesFromPrompts.push({
+            id: crypto.randomUUID(),
+            matchType: "vendor",
+            matchText: vendor,
+            note: cleanNote,
+          });
+        }
       }
     }
 
