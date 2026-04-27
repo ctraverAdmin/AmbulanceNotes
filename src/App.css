@@ -572,6 +572,35 @@ textarea {
     text-overflow: ellipsis;
     line-height: 1.15;
   }
+  /* Hide all transaction details from the printed board report */
+  .transaction-detail-print-table,
+  .transaction-detail-print-table thead,
+  .transaction-detail-print-table tbody,
+  .transaction-detail-print-table tfoot,
+  .transaction-detail-print-table tr,
+  .transaction-detail-print-table th,
+  .transaction-detail-print-table td {
+    display: none !important;
+  }
+
+  /* Hide the top summary row */
+  .print-summary {
+    display: none !important;
+  }
+
+  /* Hide the Transaction Detail heading */
+  .print-report h3:has(+ .transaction-detail-print-table) {
+    display: none !important;
+  }
+}
+
+  /* Hide transaction details from the printed board report */
+.transaction-detail-print-table,
+.transaction-detail-print-table th,
+.transaction-detail-print-table td,
+.transaction-detail-print-table tr {
+  display: none !important;
+}
 
   .transaction-detail-print-table tr.kunkle-print-row td {
     height: auto;
@@ -587,4 +616,19 @@ textarea {
     text-overflow: clip;
     line-height: 1.25;
   }
+
+  .vendor-grand-total-row td {
+  border-top: 2px solid #111827 !important;
+  font-weight: 900 !important;
+  background: #fff3b0 !important;
+  font-size: 11px !important;
+}
+
+.vendor-grand-total-row td:nth-child(1) {
+  text-align: right !important;
+}
+
+.vendor-grand-total-row td:nth-child(3) {
+  text-align: right !important;
+}
 }

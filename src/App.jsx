@@ -38,7 +38,7 @@ const defaultRules = [
     id: crypto.randomUUID(),
     matchType: "vendor",
     matchText: "KUNKLE FIRE",
-    note: "ALS Billing",
+    note: "ALS BILLING",
   },
   {
     id: crypto.randomUUID(),
@@ -170,8 +170,6 @@ function parseDelimitedLine(line) {
   let current = "";
   let insideQuotes = false;
 
-  // QuickBooks / Excel copied rows are tab-delimited.
-  // If tabs exist, split ONLY on tabs so amounts like -17,911.66 stay together.
   const delimiter = line.includes("\t") ? "\t" : ",";
 
   for (let i = 0; i < line.length; i++) {
@@ -316,10 +314,10 @@ function getPrintedBoardNote(row) {
 
   if (isKunkleFireRow(row)) {
     if (memo) {
-      return `ALS Billing — ${memo}`;
+      return `ALS BILLING — ${memo}`;
     }
 
-    return "ALS Billing — memo not provided.";
+    return "ALS BILLING — memo not provided.";
   }
 
   return row.boardNote;
@@ -327,7 +325,7 @@ function getPrintedBoardNote(row) {
 
 function getVendorSummaryNote(row) {
   if (isKunkleFireRow(row)) {
-    return "ALS Billing";
+    return "ALS BILLING";
   }
 
   return getPrintedBoardNote(row);
@@ -410,7 +408,7 @@ function App() {
       return;
     }
 
-    const parsedRows = table
+    let parsedRows = table
       .slice(1)
       .filter((cells) => {
         const vendor = cells[vendorIndex] || "";
@@ -438,7 +436,10 @@ function App() {
           account: accountIndex >= 0 ? cells[accountIndex] || "" : "",
           amount:
             amountIndex >= 0
-              ? normalizeExpenseAmount(cells[amountIndex] || "", transactionType)
+              ? normalizeExpenseAmount(
+                  cells[amountIndex] || "",
+                  transactionType
+                )
               : "",
         };
 
@@ -451,7 +452,73 @@ function App() {
         };
       });
 
-    updateState({ rows: parsedRows });
+    const needsReviewVendors = [
+      ...new Set(
+        parsedRows
+          .filter((row) => row.status === "Needs Review")
+          .map((row) => formatVendorName(row.vendor))
+          .filter(Boolean)
+      ),
+    ];
+
+    const newRulesFromPrompts = [];
+
+    for (const vendor of needsReviewVendors) {
+      const vendorRows = parsedRows.filter(
+        (row) => formatVendorName(row.vendor) === vendor
+      );
+
+      const vendorTotal = vendorRows.reduce(
+        (sum, row) => sum + amountToNumber(row.amount),
+        0
+      );
+
+      const sampleMemo =
+        vendorRows.find((row) => cleanMemoForPrint(row.memo))?.memo || "";
+
+      const enteredNote = prompt(
+        `Needs Review:
+
+Vendor: ${vendor}
+Transactions: ${vendorRows.length}
+Total: ${money(vendorTotal)}${
+          sampleMemo ? `\nSample memo: ${cleanMemoForPrint(sampleMemo)}` : ""
+        }
+
+What summary note should be used for this vendor?`
+      );
+
+      if (enteredNote && enteredNote.trim()) {
+        const cleanNote = enteredNote.trim();
+
+        parsedRows = parsedRows.map((row) =>
+          formatVendorName(row.vendor) === vendor
+            ? {
+                ...row,
+                boardNote: cleanNote,
+                status: "Rule Matched",
+              }
+            : row
+        );
+
+        newRulesFromPrompts.push({
+          id: crypto.randomUUID(),
+          matchType: "vendor",
+          matchText: vendor,
+          note: cleanNote,
+        });
+      }
+    }
+
+    const updatedRules =
+      newRulesFromPrompts.length > 0
+        ? [...state.rules, ...newRulesFromPrompts]
+        : state.rules;
+
+    updateState({
+      rows: parsedRows,
+      rules: updatedRules,
+    });
   }
 
   function regenerateNotes() {
@@ -578,6 +645,13 @@ function App() {
       }))
       .sort((a, b) => a.vendor.localeCompare(b.vendor));
   }, [state.rows]);
+
+  const vendorGrandTotal = useMemo(() => {
+    return vendorSummary.reduce(
+      (sum, vendor) => sum + amountToNumber(vendor.total),
+      0
+    );
+  }, [vendorSummary]);
 
   return (
     <div className="app-shell">
@@ -938,6 +1012,13 @@ function App() {
                 <td>{vendor.summaryNote}</td>
               </tr>
             ))}
+
+            <tr className="vendor-grand-total-row">
+              <td>Grand Total</td>
+              <td></td>
+              <td>{money(vendorGrandTotal)}</td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
 
