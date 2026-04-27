@@ -526,4 +526,71 @@ textarea {
   .transaction-detail-print-table td {
     display: none !important;
   }
+
+  /* FINAL OVERRIDE: Show all Vendor Summary columns */
+.vendor-summary-table th,
+.vendor-summary-table td {
+  display: table-cell !important;
+  padding: 4px 6px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  vertical-align: top !important;
+}
+
+/* Vendor */
+.vendor-summary-table th:nth-child(1),
+.vendor-summary-table td:nth-child(1) {
+  width: 26% !important;
+  text-align: left !important;
+}
+
+/* Transactions */
+.vendor-summary-table th:nth-child(2),
+.vendor-summary-table td:nth-child(2) {
+  width: 10% !important;
+  text-align: center !important;
+}
+
+/* Total */
+.vendor-summary-table th:nth-child(3),
+.vendor-summary-table td:nth-child(3) {
+  width: 14% !important;
+  text-align: right !important;
+  font-weight: 900 !important;
+}
+
+/* Summary Note */
+.vendor-summary-table th:nth-child(4),
+.vendor-summary-table td:nth-child(4) {
+  width: 50% !important;
+  text-align: left !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Keep total amount highlighted */
+.vendor-summary-table td:nth-child(3) {
+  background: #fff3b0 !important;
+  font-weight: 900 !important;
+}
+
+/* Grand total row */
+.vendor-grand-total-row td {
+  border-top: 2px solid #111827 !important;
+  font-weight: 900 !important;
+  background: #fff3b0 !important;
+  font-size: 11px !important;
+}
+
+.vendor-grand-total-row td:nth-child(1) {
+  text-align: right !important;
+}
+
+.vendor-grand-total-row td:nth-child(3) {
+  text-align: right !important;
+}
+
 }
