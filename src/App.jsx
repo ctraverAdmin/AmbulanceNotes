@@ -1233,39 +1233,6 @@ Note: ${cleanNote}`
           </p>
         </div>
 
-        {(state.financialNotes || []).length > 0 && (
-          <>
-            <h3>Financial Notes Not Included in Totals</h3>
-
-            <table className="print-table financial-notes-print-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {(state.financialNotes || []).map((note) => (
-                  <tr key={note.id}>
-                    <td>{note.date}</td>
-                    <td>{note.description}</td>
-                    <td>{note.amount ? money(note.amount) : ""}</td>
-                    <td>{note.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <p className="financial-note-disclaimer">
-              These financial notes are informational only and are not included
-              in the transaction totals, vendor totals, or grand total.
-            </p>
-          </>
-        )}
-
         <h3>Vendor Summary</h3>
 
         <table className="print-table vendor-summary-table">
@@ -1296,6 +1263,46 @@ Note: ${cleanNote}`
             </tr>
           </tbody>
         </table>
+
+        {(state.financialNotes || []).length > 0 && (
+          <section className="financial-notes-print-section">
+            <h3>Financial Notes Not Included in Totals</h3>
+
+            <table className="print-table financial-notes-print-table">
+              <colgroup>
+                <col className="financial-date-col" />
+                <col className="financial-description-col" />
+                <col className="financial-amount-col" />
+                <col className="financial-note-col" />
+              </colgroup>
+
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {(state.financialNotes || []).map((note) => (
+                  <tr key={note.id}>
+                    <td>{note.date}</td>
+                    <td>{note.description}</td>
+                    <td>{note.amount ? money(note.amount) : ""}</td>
+                    <td className="financial-note-wrap">{note.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <p className="financial-note-disclaimer">
+              These financial notes are informational only and are not included
+              in the transaction totals, vendor totals, or grand total.
+            </p>
+          </section>
+        )}
 
         <h3>Transaction Detail</h3>
 
