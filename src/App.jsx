@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "./App.css";
 
-const STORAGE_KEY = "ambulanceBoardNotesApp_v8";
+const STORAGE_KEY = "ambulanceBoardNotesApp_v9";
 
 const defaultRules = [
   {
@@ -38,7 +38,7 @@ const defaultRules = [
     id: crypto.randomUUID(),
     matchType: "vendor",
     matchText: "KUNKLE FIRE",
-    note: "ALS Billing",
+    note: "ALS TRIP BILLING",
   },
   {
     id: crypto.randomUUID(),
@@ -54,6 +54,7 @@ function getInitialState() {
     reportTitle: "Monthly Board Financial Notes",
     pastedText: "",
     rows: [],
+    financialNotes: [],
     rules: defaultRules,
   };
 }
@@ -68,6 +69,8 @@ function loadState() {
     return {
       ...getInitialState(),
       ...parsed,
+      rows: parsed.rows || [],
+      financialNotes: parsed.financialNotes || [],
       rules: parsed.rules?.length ? parsed.rules : defaultRules,
     };
   } catch {
@@ -333,9 +336,17 @@ function getVendorSummaryNote(row) {
 
 function App() {
   const [state, setState] = useState(loadState());
+
   const [newRule, setNewRule] = useState({
     matchType: "vendor",
     matchText: "",
+    note: "",
+  });
+
+  const [newFinancialNote, setNewFinancialNote] = useState({
+    date: "",
+    description: "",
+    amount: "",
     note: "",
   });
 
@@ -544,6 +555,57 @@ Note: ${cleanNote}`
     updateState({ rows });
   }
 
+  function addFinancialNote() {
+    if (
+      !newFinancialNote.date.trim() &&
+      !newFinancialNote.description.trim() &&
+      !newFinancialNote.amount.trim() &&
+      !newFinancialNote.note.trim()
+    ) {
+      alert("Add a date, description, amount, or note before saving.");
+      return;
+    }
+
+    const updatedNotes = [
+      ...(state.financialNotes || []),
+      {
+        id: crypto.randomUUID(),
+        date: newFinancialNote.date.trim(),
+        description: newFinancialNote.description.trim(),
+        amount: newFinancialNote.amount.trim(),
+        note: newFinancialNote.note.trim(),
+      },
+    ];
+
+    updateState({ financialNotes: updatedNotes });
+
+    setNewFinancialNote({
+      date: "",
+      description: "",
+      amount: "",
+      note: "",
+    });
+  }
+
+  function updateFinancialNote(id, field, value) {
+    const updatedNotes = (state.financialNotes || []).map((note) =>
+      note.id === id ? { ...note, [field]: value } : note
+    );
+
+    updateState({ financialNotes: updatedNotes });
+  }
+
+  function deleteFinancialNote(id) {
+    const ok = confirm("Delete this financial note?");
+    if (!ok) return;
+
+    const updatedNotes = (state.financialNotes || []).filter(
+      (note) => note.id !== id
+    );
+
+    updateState({ financialNotes: updatedNotes });
+  }
+
   function addRule() {
     if (!newRule.matchText.trim() || !newRule.note.trim()) {
       alert("Add both the match text and the board note.");
@@ -584,6 +646,17 @@ Note: ${cleanNote}`
     updateState({
       pastedText: "",
       rows: [],
+    });
+  }
+
+  function clearFinancialNotes() {
+    const ok = confirm(
+      "Clear all financial notes that are not included in totals?"
+    );
+    if (!ok) return;
+
+    updateState({
+      financialNotes: [],
     });
   }
 
@@ -717,6 +790,11 @@ Note: ${cleanNote}`
         <div className="stat-card">
           <span>Total Amount</span>
           <strong>{money(totals.total)}</strong>
+        </div>
+
+        <div className="stat-card info-stat">
+          <span>Separate Financial Notes</span>
+          <strong>{(state.financialNotes || []).length}</strong>
         </div>
       </section>
 
@@ -902,10 +980,165 @@ Note: ${cleanNote}`
         </div>
       </section>
 
+      <section className="card full-width-card no-print">
+        <div className="section-heading">
+          <div>
+            <h2>3. Financial Notes Not Included in Totals</h2>
+            <p>
+              Use this for financial explanations, pending items, timing notes,
+              voids, transfers, or reminders that should print on the board
+              report but should not affect the transaction totals.
+            </p>
+          </div>
+
+          <button className="danger" onClick={clearFinancialNotes}>
+            Clear Financial Notes
+          </button>
+        </div>
+
+        <div className="rule-form">
+          <input
+            value={newFinancialNote.date}
+            placeholder="Date, if applicable"
+            onChange={(e) =>
+              setNewFinancialNote({
+                ...newFinancialNote,
+                date: e.target.value,
+              })
+            }
+          />
+
+          <input
+            value={newFinancialNote.description}
+            placeholder="Description"
+            onChange={(e) =>
+              setNewFinancialNote({
+                ...newFinancialNote,
+                description: e.target.value,
+              })
+            }
+          />
+
+          <input
+            value={newFinancialNote.amount}
+            placeholder="Amount, if applicable"
+            onChange={(e) =>
+              setNewFinancialNote({
+                ...newFinancialNote,
+                amount: e.target.value,
+              })
+            }
+          />
+
+          <input
+            value={newFinancialNote.note}
+            placeholder="Financial note"
+            onChange={(e) =>
+              setNewFinancialNote({
+                ...newFinancialNote,
+                note: e.target.value,
+              })
+            }
+          />
+
+          <button onClick={addFinancialNote}>Add Financial Note</button>
+        </div>
+
+        <div className="table-wrap">
+          <table className="review-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Note</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {(state.financialNotes || []).length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="empty-cell">
+                    No separate financial notes have been added.
+                  </td>
+                </tr>
+              ) : (
+                (state.financialNotes || []).map((note) => (
+                  <tr key={note.id}>
+                    <td>
+                      <input
+                        value={note.date}
+                        onChange={(e) =>
+                          updateFinancialNote(
+                            note.id,
+                            "date",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        value={note.description}
+                        onChange={(e) =>
+                          updateFinancialNote(
+                            note.id,
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        value={note.amount}
+                        onChange={(e) =>
+                          updateFinancialNote(
+                            note.id,
+                            "amount",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+
+                    <td>
+                      <textarea
+                        className="note-box"
+                        value={note.note}
+                        onChange={(e) =>
+                          updateFinancialNote(
+                            note.id,
+                            "note",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+
+                    <td>
+                      <button
+                        className="danger small"
+                        onClick={() => deleteFinancialNote(note.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section className="card rules-section no-print">
         <div className="section-heading">
           <div>
-            <h2>3. Reusable Note Rules</h2>
+            <h2>4. Reusable Note Rules</h2>
             <p>
               These are the only notes the app uses. Add your approved wording
               here once, then reuse it every month.
@@ -999,6 +1232,39 @@ Note: ${cleanNote}`
             <strong>Total Amount:</strong> {money(totals.total)}
           </p>
         </div>
+
+        {(state.financialNotes || []).length > 0 && (
+          <>
+            <h3>Financial Notes Not Included in Totals</h3>
+
+            <table className="print-table financial-notes-print-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {(state.financialNotes || []).map((note) => (
+                  <tr key={note.id}>
+                    <td>{note.date}</td>
+                    <td>{note.description}</td>
+                    <td>{note.amount ? money(note.amount) : ""}</td>
+                    <td>{note.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <p className="financial-note-disclaimer">
+              These financial notes are informational only and are not included
+              in the transaction totals, vendor totals, or grand total.
+            </p>
+          </>
+        )}
 
         <h3>Vendor Summary</h3>
 
