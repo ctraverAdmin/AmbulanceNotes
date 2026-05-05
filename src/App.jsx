@@ -983,7 +983,7 @@ Note: ${cleanNote}`
       <section className="card full-width-card no-print">
         <div className="section-heading">
           <div>
-            <h2>3. Financial Notes Not Included in Totals</h2>
+            <h2>3. Special Financial Notes</h2>
             <p>
               Use this for financial explanations, pending items, timing notes,
               voids, transfers, or reminders that should print on the board
@@ -1266,7 +1266,7 @@ Note: ${cleanNote}`
 
         {(state.financialNotes || []).length > 0 && (
           <section className="financial-notes-print-section">
-            <h3>Financial Notes Not Included in Totals</h3>
+            <h3>Special Financial Notes</h3>
 
             <table className="print-table financial-notes-print-table">
               <colgroup>
@@ -1298,8 +1298,7 @@ Note: ${cleanNote}`
             </table>
 
             <p className="financial-note-disclaimer">
-              These financial notes are informational only and are not included
-              in the transaction totals, vendor totals, or grand total.
+              These financial notes are informational only as special items that came in during the month.
             </p>
           </section>
         )}
